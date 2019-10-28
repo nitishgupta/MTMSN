@@ -1,0 +1,40 @@
+# Path containing trained model
+SERIALIZATION_DIR=/shared/nitishg/checkpoints/drop/MTMSN/full_data/S_10/MTMSNModel
+PREDICTION_DIR=${SERIALIZATION_DIR}/predictions
+
+# Data root directory
+DATA_DIR_ROOT=/shared/nitishg/data/drop/raw
+# Path to Json file on which evaluation will be run
+DEV_DATA_JSON=${DATA_DIR_ROOT}/drop_dataset_dev.json
+
+DEV_DATA_JSON=/shared/nitishg/minimal-pairs/ddua_annotations/minimal_pairs_dev.json
+
+# Where to store predictions
+PREDICTIONS_JSON=ddua_preds.json
+METRICS_JSON=ddua_metrics.json
+
+mkdir ${PREDICTION_DIR}
+
+BERT_DIR=bert-base-uncased
+
+python -m bert.run_mtmsn \
+  --vocab_file $BERT_DIR/vocab.txt \
+  --bert_config_file $BERT_DIR/bert_config.json \
+  --init_checkpoint $BERT_DIR/pytorch_model.bin \
+  --do_predict \
+  --do_lower_case \
+  --predict_file ${DEV_DATA_JSON} \
+  --train_batch_size 8 \
+  --predict_batch_size 8 \
+  --num_train_epochs 10.0 \
+  --learning_rate 3e-5 \
+  --max_seq_length 512 \
+  --span_extraction \
+  --addition_subtraction \
+  --counting \
+  --negation \
+  --gradient_accumulation_steps 2 \
+  --output_dir ${SERIALIZATION_DIR} \
+  --prediction_dir ${PREDICTION_DIR} \
+  --predictions_json ${PREDICTIONS_JSON} \
+  --metrics_json ${METRICS_JSON}

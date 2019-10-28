@@ -323,7 +323,7 @@ def evaluate(args, model, device, eval_examples, eval_features, logger, write_pr
                                                  args.do_lower_case, args.verbose_logging, logger)
 
     if write_pred:
-        output_prediction_file = os.path.join(args.output_dir, "predictions.json")
+        output_prediction_file = os.path.join(args.prediction_dir, args.predictions_json)
         with open(output_prediction_file, "w") as writer:
             writer.write(json.dumps(all_predictions, indent=4) + "\n")
         logger.info("Writing predictions to: %s" % (output_prediction_file))
@@ -357,6 +357,9 @@ def main():
     parser.add_argument("--do_debug", default=False, action='store_true', help="Whether to run in debug mode.")
     parser.add_argument("--train_file", default=None, type=str, help="DROP json for training. E.g., drop_dataset_train.json")
     parser.add_argument("--predict_file", default=None, type=str, help="DROP json for predictions.")
+    parser.add_argument("--prediction_dir", default=None, type=str, help="Nitish added: directory for predictions and metrircs")
+    parser.add_argument("--predictions_json", default=None, type=str, help="Nitish added: file name to write predictions")
+    parser.add_argument("--metrics_json", default=None, type=str, help="Nitish added: filename for metrics")
     parser.add_argument("--init_checkpoint", default=None, type=str,
                         help="Initial checkpoint (usually from a pre-trained BERT model).")
     parser.add_argument("--do_lower_case", default=False, action='store_true',
@@ -559,7 +562,7 @@ def main():
                          t_total=num_train_steps)
 
     global_step, global_epoch = 0, 1
-    if os.path.isfile(save_path):
+    if os.path.isfile(save_path) and args.do_train:
         checkpoint = torch.load(save_path)
         optimizer.load_state_dict(checkpoint['optimizer'])
         logger.info("Load optimizer from finetuned checkpoint: '{}' (step {}, epoch {})"
@@ -596,11 +599,17 @@ def main():
 
         model.eval()
         metrics = evaluate(args, model, device, eval_examples, eval_features, logger, write_pred=True)
-        f = open(log_path, "a")
-        print("step: {}, test_em: {:.3f}, test_f1: {:.3f}"
-              .format(global_step, metrics['em'], metrics['f1']), file=f)
-        print(" ", file=f)
+        metrics_path = os.path.join(args.prediction_dir, args.metrics_json)
+        f = open(metrics_path, "w")
+        metrics_dict = {'f1': metrics['f1'], 'em': metrics['em']}
+        json.dump(metrics_dict, f)
         f.close()
+        logger.info("Predition written to : {}".format(metrics_path))
+	
+        # print("step: {}, test_em: {:.3f}, test_f1: {:.3f}"
+        #       .format(global_step, metrics['em'], metrics['f1']), file=f)
+        # print(" ", file=f)
+        # f.close()
 
 
 if __name__ == "__main__":
