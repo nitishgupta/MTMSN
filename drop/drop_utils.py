@@ -962,6 +962,10 @@ def write_predictions(all_examples, all_features, all_results, answering_abiliti
         assert len(nbest_json) >= 1 and len(predicted_answers) >= 1
         if example.answer_annotations:
             drop_metrics(predicted_answers, example.answer_annotations)
+            em, f1 = drop_em_and_f1(predicted=predicted_answers, gold=example.answer_annotations)
+            for output in nbest_json:
+                output["f1"] = f1
+                output["em"] = em
         all_nbest_json[example.qas_id] = nbest_json
 
     exact_match, f1_score = drop_metrics.get_metric(reset=True)
