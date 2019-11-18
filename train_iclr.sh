@@ -1,29 +1,24 @@
-# Path containing trained model
-SERIALIZATION_DIR=/shared/nitishg/checkpoints/drop/MTMSN/full_data/S_10/MTMSNModel
+SEED=1000
+  
+SERIALIZATION_DIR=/shared/nitishg/checkpoints/drop/MTMSN/date_yd_num_hmyw_cnt_whoarg_600/S_${SEED}/MTMSNModel
 PREDICTION_DIR=${SERIALIZATION_DIR}/predictions
 
-# Data root directory
-DATA_DIR_ROOT=/shared/nitishg/data/drop/raw
-# Path to Json file on which evaluation will be run
-DEV_DATA_JSON=${DATA_DIR_ROOT}/drop_dataset_dev.json
-
-DEV_DATA_JSON=/shared/nitishg/minimal-pairs/final_annotations/minimal_pairs_test.json
-
-# Where to store predictions
-PREDICTIONS_JSON=minimal_pairs_test_preds.json
-METRICS_JSON=minimal_pairs_test_metrics.json
-
-mkdir ${PREDICTION_DIR}
-
 BERT_DIR=bert-base-uncased
+
+DATA_DIR=/shared/nitishg/data/drop_iclr/date_num/date_yd_num_hmyw_cnt_whoarg_600
+
+PREDICTIONS_JSON=mydev_preds.json
+METRICS_JSON=mydev_metrics.json
 
 python -m bert.run_mtmsn \
   --vocab_file $BERT_DIR/vocab.txt \
   --bert_config_file $BERT_DIR/bert_config.json \
   --init_checkpoint $BERT_DIR/pytorch_model.bin \
+  --do_train \
   --do_predict \
   --do_lower_case \
-  --predict_file ${DEV_DATA_JSON} \
+  --train_file $DATA_DIR/drop_dataset_train.json \
+  --predict_file $DATA_DIR/drop_dataset_mydev.json \
   --train_batch_size 8 \
   --predict_batch_size 8 \
   --num_train_epochs 10.0 \
@@ -34,7 +29,9 @@ python -m bert.run_mtmsn \
   --counting \
   --negation \
   --gradient_accumulation_steps 2 \
+  --seed ${SEED} \
   --output_dir ${SERIALIZATION_DIR} \
   --prediction_dir ${PREDICTION_DIR} \
   --predictions_json ${PREDICTIONS_JSON} \
   --metrics_json ${METRICS_JSON}
+
