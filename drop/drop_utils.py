@@ -243,7 +243,8 @@ class DropReader(object):
                 if "validated_answers" in question_answer:
                     answer_annotations += question_answer["validated_answers"]
 
-                example = self.text_to_example(question_text, passage_text, question_id, answer_annotations, passage_tokens)
+                example = self.text_to_example(question_text, passage_text, question_id,
+                                               answer_annotations, passage_tokens)
                 if example is not None:
                     examples.append(example)
                 else:
@@ -254,11 +255,11 @@ class DropReader(object):
         return examples
 
     def text_to_example(self,  # type: ignore
-                         question_text: str,
-                         passage_text: str,
-                         question_id: str,
-                         answer_annotations: List[Dict] = None,
-                         passage_tokens: List[Token] = None):
+                        question_text: str,
+                        passage_text: str,
+                        question_id: str,
+                        answer_annotations: List[Dict] = None,
+                        passage_tokens: List[Token] = None):
         if not passage_tokens:
             passage_tokens = self._tokenizer.tokenize(passage_text)
             passage_tokens = split_tokens_by_hyphen(passage_tokens)
@@ -288,7 +289,6 @@ class DropReader(object):
             if number is not None:
                 numbers_in_passage.append(number)
                 number_indices.append(token_index)
-
         valid_passage_spans = \
             self.find_valid_spans(passage_tokens, tokenized_answer_texts) if tokenized_answer_texts else []
         valid_question_spans = \

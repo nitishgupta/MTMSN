@@ -512,6 +512,8 @@ def main():
 
     if os.path.isfile(save_path):
         checkpoint = torch.load(save_path)
+        print(checkpoint['model'])
+        exit()
         model.load_state_dict(checkpoint['model'])
         logger.info("Loading model from finetuned checkpoint: '{}' (step {}, epoch {})"
                     .format(save_path, checkpoint['step'], checkpoint['epoch']))
