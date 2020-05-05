@@ -1,11 +1,12 @@
 # Path containing trained model
-SERIALIZATION_DIR=/shared/nitishg/checkpoints/drop/MTMSN/full_data/S_10/MTMSNModel
+
+MTMSN_BASE=/shared/nitishg/checkpoints/drop/MTMSN/full_data/S_10/MTMSNModel
+
+SERIALIZATION_DIR=${MTMSN_BASE}
 PREDICTION_DIR=${SERIALIZATION_DIR}/predictions
 
-# Data root directory
-DATA_DIR_ROOT=/shared/nitishg/data/drop/raw
 # Path to Json file on which evaluation will be run
-DEV_DATA_JSON=${DATA_DIR_ROOT}/drop_dataset_dev.json
+DEV_DATA_JSON=/shared/nitishg/data/drop/raw/drop_dataset_dev.json
 
 DEV_DATA_JSON=/shared/nitishg/minimal-pairs/final_annotations/minimal_pairs_test.json
 

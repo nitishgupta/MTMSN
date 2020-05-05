@@ -23,6 +23,7 @@ import logging
 import os
 import json
 import random
+from collections import OrderedDict
 
 import numpy as np
 import torch
@@ -512,12 +513,9 @@ def main():
 
     if os.path.isfile(save_path):
         checkpoint = torch.load(save_path)
-        print(checkpoint['model'])
-        exit()
         model.load_state_dict(checkpoint['model'])
         logger.info("Loading model from finetuned checkpoint: '{}' (step {}, epoch {})"
                     .format(save_path, checkpoint['step'], checkpoint['epoch']))
-
     f = open(network_path, "w")
     for n, param in model.named_parameters():
         print("name: {}, size: {}, dtype: {}, requires_grad: {}"
