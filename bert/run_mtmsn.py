@@ -35,7 +35,7 @@ from drop.drop_utils import DropReader, convert_examples_to_features, get_tensor
     ClusteredBatcher, FixedOrderBatcher, FeatureLenKey, batch_annotate_candidates
 from drop.drop_metric import DropEmAndF1
 
-logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s', 
+logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt = '%m/%d/%Y %H:%M:%S',
                     level = logging.INFO)
 logger = logging.getLogger(__name__)
@@ -238,6 +238,7 @@ def run_train_epoch(args, global_step, n_gpu, device, model, param_optimizer, op
     print(" ", file=f)
     f.close()
     if metrics['f1'] > best_f1:
+        logger.info("F1 score: {}".format(metrics['f1']))
         logger.info("Save model at {} (step {}, epoch {})".format(save_path, global_step, epoch))
         best_f1 = metrics['f1']
         torch.save({
@@ -324,6 +325,7 @@ def evaluate(args, model, device, eval_examples, eval_features, logger, write_pr
 
     if write_pred:
         output_prediction_file = os.path.join(args.prediction_dir, args.predictions_json)
+        os.makedirs(args.prediction_dir, exist_ok=True)
         with open(output_prediction_file, "w") as writer:
             writer.write(json.dumps(all_predictions, indent=4) + "\n")
         logger.info("Writing predictions to: %s" % (output_prediction_file))
@@ -397,8 +399,8 @@ def main():
                         default=False,
                         action='store_true',
                         help="Whether not to use data parallel")
-    parser.add_argument('--seed', 
-                        type=int, 
+    parser.add_argument('--seed',
+                        type=int,
                         default=42,
                         help="random seed for initialization")
     parser.add_argument('--gradient_accumulation_steps',
@@ -512,7 +514,7 @@ def main():
 
     if os.path.isfile(save_path):
         checkpoint = torch.load(save_path)
-        print(checkpoint['model'])
+        print(checkpoint['model'].keys())
         exit()
         model.load_state_dict(checkpoint['model'])
         logger.info("Loading model from finetuned checkpoint: '{}' (step {}, epoch {})"
@@ -607,7 +609,7 @@ def main():
         json.dump(metrics_dict, f)
         f.close()
         logger.info("Predition written to : {}".format(metrics_path))
-	
+
         # print("step: {}, test_em: {:.3f}, test_f1: {:.3f}"
         #       .format(global_step, metrics['em'], metrics['f1']), file=f)
         # print(" ", file=f)
